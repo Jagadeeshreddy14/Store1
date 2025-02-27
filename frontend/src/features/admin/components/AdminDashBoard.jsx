@@ -38,6 +38,9 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 
+// Configure axios base URL
+axios.defaults.baseURL = 'http://localhost:8000';
+
 const sortOptions=[
     {name:"Price: low to high",sort:"price",order:"asc"},
     {name:"Price: high to low",sort:"price",order:"desc"},
@@ -167,7 +170,7 @@ export const AdminDashBoard = () => {
     
     const handleDeleteCoupon = async (couponId) => {
       try {
-        await axios.delete(`/api/coupons/${couponId}`);
+        await axios.delete(`/coupons/${couponId}`);
         setCoupons(coupons.filter(coupon => coupon._id !== couponId));
         toast.success('Coupon deleted successfully');
       } catch (error) {
@@ -177,21 +180,32 @@ export const AdminDashBoard = () => {
     
     const handleSubmitCoupon = async () => {
       try {
+        const formattedCouponData = {
+          ...couponForm,
+          startDate: new Date(couponForm.startDate).toISOString(),
+          endDate: new Date(couponForm.endDate).toISOString(),
+          discountValue: Number(couponForm.discountValue),
+          minPurchase: Number(couponForm.minPurchase),
+          maxDiscount: Number(couponForm.maxDiscount)
+        };
+    
+        console.log('Sending coupon data:', formattedCouponData);
+    
         if (selectedCoupon) {
-
-            const response = await axios.put(`/api/coupons/${selectedCoupon._id}`, couponForm);
+          const response = await axios.put(`/coupons/${selectedCoupon._id}`, formattedCouponData);
           const updatedCoupons = coupons.map(coupon =>
             coupon._id === selectedCoupon._id ? response.data : coupon
           );
           setCoupons(updatedCoupons);
           toast.success('Coupon updated successfully');
         } else {
-          const response = await axios.post('/api/coupons', couponForm);
+          const response = await axios.post('/coupons', formattedCouponData);
           setCoupons([...coupons, response.data]);
           toast.success('Coupon created successfully');
         }
         handleCloseCouponDialog();
       } catch (error) {
+        console.error('Coupon error:', error.response?.data || error);
         toast.error(error.response?.data?.message || 'Error saving coupon');
       }
     };
@@ -210,7 +224,7 @@ export const AdminDashBoard = () => {
     useEffect(() => {
       const fetchCoupons = async () => {
         try {
-          const response = await axios.get('/api/coupons');
+          const response = await axios.get('/coupons');
           setCoupons(response.data);
         } catch (error) {
           toast.error('Failed to fetch coupons');

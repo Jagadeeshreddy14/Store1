@@ -15,7 +15,7 @@ const reviewRoutes=require("./routes/Review")
 const wishlistRoutes=require("./routes/Wishlist")
 const couponRoutes = require('./routes/Coupon');
 const { connectToDB } = require("./database/db")
-
+const mongoose = require('mongoose');
 
 // server init
 const server=express()
@@ -25,10 +25,17 @@ connectToDB()
 
 
 // middlewares
-server.use(cors({origin:process.env.ORIGIN,credentials:true,exposedHeaders:['X-Total-Count'],methods:['GET','POST','PATCH','DELETE']}))
+server.use(cors({origin:process.env.ORIGIN || 'http://localhost:3000',credentials:true,exposedHeaders:['X-Total-Count'],methods:['GET','POST','PATCH','DELETE']}))
 server.use(express.json())
+server.use(express.urlencoded({ extended: true }));
 server.use(cookieParser())
 server.use(morgan("tiny"))
+
+// Add error logging middleware
+server.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).json({ message: 'Something broke!', error: err.message });
+});
 
 // routeMiddleware
 server.use("/auth",authRoutes)
@@ -41,7 +48,7 @@ server.use("/categories",categoryRoutes)
 server.use("/address",addressRoutes)
 server.use("/reviews",reviewRoutes)
 server.use("/wishlist",wishlistRoutes)
-server.use("/api/coupons", couponRoutes); // Note the /api prefix
+server.use("/coupons", couponRoutes);
 
 
 server.get("/",(req,res)=>{

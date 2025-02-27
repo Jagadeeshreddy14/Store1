@@ -2,7 +2,6 @@ const express = require('express');
 const router = express.Router();
 const Coupon = require('../models/Coupon');
 
-// Get all coupons
 router.get('/', async (req, res) => {
   try {
     const coupons = await Coupon.find();
@@ -12,7 +11,6 @@ router.get('/', async (req, res) => {
   }
 });
 
-// Create new coupon
 router.post('/', async (req, res) => {
   try {
     const coupon = new Coupon(req.body);
@@ -23,25 +21,19 @@ router.post('/', async (req, res) => {
   }
 });
 
-// Update coupon
 router.put('/:id', async (req, res) => {
   try {
-    const coupon = await Coupon.findByIdAndUpdate(
-      req.params.id, 
-      req.body,
-      { new: true }
-    );
+    const coupon = await Coupon.findByIdAndUpdate(req.params.id, req.body, { new: true });
     res.json(coupon);
   } catch (error) {
     res.status(400).json({ message: error.message });
   }
 });
 
-// Delete coupon
 router.delete('/:id', async (req, res) => {
   try {
     await Coupon.findByIdAndDelete(req.params.id);
-    res.json({ message: 'Coupon deleted successfully' });
+    res.json({ message: 'Coupon deleted' });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

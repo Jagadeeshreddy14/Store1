@@ -9,19 +9,22 @@ const couponSchema = new mongoose.Schema({
   },
   discountType: {
     type: String,
-    enum: ['percentage', 'fixed'],
-    required: true
+    required: true,
+    enum: ['percentage', 'fixed']
   },
   discountValue: {
     type: Number,
-    required: true
+    required: true,
+    min: 0
   },
   minPurchase: {
     type: Number,
+    min: 0,
     default: 0
   },
   maxDiscount: {
-    type: Number
+    type: Number,
+    min: 0
   },
   startDate: {
     type: Date,
@@ -30,10 +33,6 @@ const couponSchema = new mongoose.Schema({
   endDate: {
     type: Date,
     required: true
-  },
-  isActive: {
-    type: Boolean,
-    default: true
   }
 }, { timestamps: true });
 
