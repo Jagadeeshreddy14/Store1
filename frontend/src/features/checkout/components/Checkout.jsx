@@ -159,6 +159,25 @@ export const Checkout = () => {
         }
       };
 
+      const validateCoupon = async (code) => {
+        try {
+          const response = await axios.post('/coupons/validate', {
+            code,
+            cartTotal: orderTotal // Use orderTotal instead of cart.total
+          });
+      
+          // Apply discount
+          if (response.data.valid) {
+            setAppliedCoupon(response.data.coupon); // Use setAppliedCoupon instead of setDiscount
+            toast.success('Coupon applied successfully!');
+          }
+        } catch (error) {
+          console.error('Coupon validation error:', error);
+          setAppliedCoupon(null); // Use setAppliedCoupon instead of setDiscount
+          toast.error(error.response?.data?.message || 'Invalid coupon code');
+        }
+      };
+
   return (
     <Stack flexDirection={'row'} p={2} rowGap={10} justifyContent={'center'} flexWrap={'wrap'} mb={'5rem'} mt={2} columnGap={4} alignItems={'flex-start'}>
 
